@@ -4,23 +4,18 @@ from api.models import Follow, Group, Post
 from api.permission import OwnPermission
 from api.serializers import (CommentSerializer, FollowSerializer,
                              GroupSerializer, PostSerializer)
-
+from django_filters import rest_framework
 from rest_framework import filters, generics, viewsets
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 
 
 class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, OwnPermission)
-
-    def get_queryset(self):
-        posts = Post.objects.all()
-        group = self.request.query_params.get('group', None)
-        if group is not None:
-            posts_group = posts.filter(group=group)
-            return posts_group
-        return posts
+    filter_backends = (rest_framework.DjangoFilterBackend,)
+    filterset_fields = ('group',)
 
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
