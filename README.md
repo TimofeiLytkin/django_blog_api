@@ -1,2 +1,2 @@
-# api_final
-api final
+# django_blog_api
+django_blog_api
